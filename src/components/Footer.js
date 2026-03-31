@@ -100,7 +100,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
-          <p>© {year} Terranova Inmobiliaria. Todos los derechos reservados.</p>
+          <p>© {year} John Vicent. Todos los derechos reservados.</p>
           <p>Diseño y desarrollo con ♥ en España</p>
         </div>
       </div>

@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum Channel {
+  WEB
+  WHATSAPP
+  EMAIL
+}
+
+enum Intention {
+  COMPRA
+  ALQUILER
+  VENTA
+  INFORMACION
+  SPAM
+}
+
+enum Urgency {
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum LeadStatus {
+  NUEVO
+  CONTACTADO
+  EN_PROGRESO
+  CERRADO_GANADO
+  CERRADO_PERDIDO
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum AgentRole {
+  ADMIN
+  AGENTE
+}
+
+enum PropertyType {
+  VENTA
+  ALQUILER
+}
+
+// ─── Models ─────────────────────────────────────────────
+
+model Lead {
+  id        String   @id @default(cuid())
+  nombre    String
+  apellidos String?
+  email     String?
+  telefono  String?
+  canal     Channel  @default(WEB)
+
+  // AI classification
+  intencion Intention?
+  urgencia  Urgency?
+  score     Int?       @default(0)
+  resumenIA String?
+
+  // Status & assignment
+  estado    LeadStatus @default(NUEVO)
+  agenteId  String?
+  agente    Agent?     @relation(fields: [agenteId], references: [id])
+
+  // Relations
+  mensajes  Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([estado])
+  @@index([urgencia])
+  @@index([canal])
+  @@index([agenteId])
+  @@index([email])
+  @@index([telefono])
+}
+
+model Message {
+  id        String           @id @default(cuid())
+  leadId    String
+  lead      Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contenido String
+  canal     Channel
+  direccion MessageDirection
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model Property {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  location    String
+  region      String
+  description String
+  price       Float
+  type        PropertyType
+  bedrooms    Int
+  bathrooms   Int
+  area        Int
+  image       String
+  featured    Boolean      @default(false)
+  tags        String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Agent {
+  id           String    @id @default(cuid())
+  nombre       String
+  email        String    @unique
+  passwordHash String
+  rol          AgentRole @default(AGENTE)
+  activo       Boolean   @default(true)
+
+  leads     Lead[]
+  auditLogs AuditLog[]
+
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String @id @default(cuid())
+  agentId   String
+  agent     Agent  @relation(fields: [agentId], references: [id])
+  accion    String
+  entidad   String
+  entidadId String
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
+  @@index([entidad, entidadId])
+}

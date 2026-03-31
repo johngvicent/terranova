@@ -3,13 +3,47 @@
 import { useState, useRef } from "react";
 
 export default function ContactForm() {
-  const [status, setStatus] = useState("idle"); // idle | success | error
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errorMsg, setErrorMsg] = useState("");
   const formRef = useRef(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setStatus("success");
-    formRef.current?.reset();
+    setStatus("sending");
+    setErrorMsg("");
+
+    const form = formRef.current;
+    const data = {
+      nombre: form.name.value,
+      apellidos: form.lastname.value,
+      email: form.email.value,
+      telefono: form.phone.value,
+      interes: form.interest.value,
+      mensaje: form.message.value,
+      privacidad: form.privacy.checked,
+    };
+
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setStatus("error");
+        setErrorMsg(result.error || "Error al enviar el mensaje");
+        return;
+      }
+
+      setStatus("success");
+      form.reset();
+    } catch {
+      setStatus("error");
+      setErrorMsg("Error de conexión. Inténtalo de nuevo.");
+    }
   }
 
   return (
@@ -74,9 +108,10 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        className="w-full py-4 rounded-full bg-[#e35336] hover:bg-[#c44729] text-white font-semibold text-base transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#e35336] focus-visible:outline-offset-2"
+        disabled={status === "sending"}
+        className="w-full py-4 rounded-full bg-[#e35336] hover:bg-[#c44729] text-white font-semibold text-base transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#e35336] focus-visible:outline-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Enviar mensaje
+        {status === "sending" ? "Enviando..." : "Enviar mensaje"}
       </button>
 
       {status === "success" && (
@@ -85,6 +120,13 @@ export default function ContactForm() {
           <span>
             ¡Mensaje enviado! Nos pondremos en contacto contigo en menos de 24 horas.
           </span>
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800 flex items-center gap-3">
+          <span className="text-red-500 text-lg">✗</span>
+          <span>{errorMsg}</span>
         </div>
       )}
     </form>
