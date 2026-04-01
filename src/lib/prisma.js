@@ -3,10 +3,18 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis;
 
+function getDirectUrl() {
+  const raw = process.env.DATABASE_URL;
+  if (!raw.startsWith("prisma+postgres://")) return raw;
+  const url = new URL(raw);
+  const payload = JSON.parse(
+    Buffer.from(url.searchParams.get("api_key"), "base64").toString()
+  );
+  return payload.databaseUrl;
+}
+
 function createPrismaClient() {
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  });
+  const adapter = new PrismaPg({ connectionString: getDirectUrl() });
   return new PrismaClient({ adapter });
 }
 
