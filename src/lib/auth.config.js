@@ -1,6 +1,6 @@
 /**
  * Auth.js config that is safe for Edge Runtime (no Prisma, no Node APIs).
- * Used by middleware.js for session checking.
+ * Used by proxy.js for session checking.
  * The full auth.js re-exports this and adds the CredentialsProvider with Prisma.
  */
 export const authConfig = {

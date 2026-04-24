@@ -1,13 +1,9 @@
 import Link from "next/link";
+import { getLeadStats } from "@/lib/leads/stats";
 
 async function getStats() {
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/leads/stats`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return res.json();
+    return await getLeadStats();
   } catch {
     return null;
   }

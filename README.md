@@ -120,13 +120,10 @@ npm install
 cp .env.example .env.local
 # Editar .env.local con tus credenciales (ver sección Variables de Entorno)
 
-# 4. Generar el cliente Prisma
-npx prisma generate
-
-# 5. Ejecutar migraciones de base de datos
+# 4. Ejecutar migraciones de base de datos
 npx prisma migrate dev --name init
 
-# 6. (Opcional) Crear un agente admin inicial
+# 5. (Opcional) Crear un agente admin inicial
 node -e "
 const { createHash } = require('crypto');
 const hash = createHash('sha256').update('tu-contraseña').digest('hex');
@@ -134,9 +131,11 @@ console.log('Hash:', hash);
 // Usarlo en: npx prisma studio → tabla Agent → crear registro
 "
 
-# 7. Arrancar en desarrollo
+# 6. Arrancar en desarrollo
 npm run dev
 ```
+
+`npm install` ya ejecuta `prisma generate` automáticamente mediante `postinstall`, así que solo hace falta lanzarlo manualmente si quieres regenerar el cliente a demanda.
 
 Abre [http://localhost:3000](http://localhost:3000) para ver el sitio público y [http://localhost:3000/admin/login](http://localhost:3000/admin/login) para el panel de gestión.
 
@@ -166,6 +165,7 @@ Copia `.env.example` a `.env.local` y rellena cada valor:
 | `AUTH_SECRET` | Secreto para firmar tokens JWT | `npx auth secret` |
 | `WHATSAPP_TOKEN` | Token de acceso de WhatsApp Business | Meta Developer Console → WhatsApp → API Setup |
 | `WHATSAPP_VERIFY_TOKEN` | Token personalizado para verificar el webhook | Inventar uno propio |
+| `WHATSAPP_APP_SECRET` | Secreto de la app de Meta para validar la firma del webhook | Meta Developer Console → App Settings → Basic |
 | `WHATSAPP_PHONE_NUMBER_ID` | ID del número de teléfono de WhatsApp | Meta Developer Console |
 | `SENDGRID_API_KEY` | API key de SendGrid | [app.sendgrid.com/settings/api_keys](https://app.sendgrid.com/settings/api_keys) |
 | `EMAIL_FROM` | Dirección de envío de emails | p.ej. `contacto@terranova.es` |
@@ -234,7 +234,7 @@ terranova/
 │   │   ├── prisma.js           # Singleton PrismaClient
 │   │   ├── ratelimit.js        # Rate limiter en memoria
 │   │   └── validations.js      # Schemas Zod
-│   └── middleware.js           # Protección /admin + /api/leads
+│   └── proxy.js                # Protección /admin + /api/leads
 ├── .env.example                # Template de variables de entorno
 ├── next.config.mjs             # Headers de seguridad + imagen remota
 └── package.json
