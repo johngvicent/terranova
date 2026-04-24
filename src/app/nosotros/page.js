@@ -31,14 +31,14 @@ const values = [
 
 const team = [
   {
-    name: "Elena Martínez",
-    role: "Fundadora & Directora",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+    name: "John Vicent",
+    role: "Fundador & Director",
+    img: "https://johnvicent.es/john-about.jpg",
   },
   {
-    name: "Carlos Ruiz",
-    role: "Director Comercial",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
+    name: "Carla Ruiz",
+    role: "Directora Comercial",
+    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
   },
   {
     name: "Marta Fernández",
@@ -48,7 +48,7 @@ const team = [
   {
     name: "Javier Sola",
     role: "Asesor — Costa Atlántica",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
   },
 ];
 
@@ -110,7 +110,7 @@ export default function NosotrosPage() {
             </div>
             <div className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80"
+                src="/people/work.jpg"
                 alt="Equipo Terranova trabajando"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"

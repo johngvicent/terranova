@@ -1,0 +1,106 @@
+Eres un diseñador senior de presentaciones y especialista en proptech. 
+Tu tarea es convertir el siguiente guión de presentación en una estructura de diapositivas 
+profesional para Google Slides.
+
+### CONTEXTO DEL PROYECTO
+- Producto: Terranova (sistema de triaje IA para leads inmobiliarios)
+- Duración: 15-20 minutos de presentación en vivo
+- Audiencia: Personas 25-30 años, sin conocimientos técnicos
+- Tono: Cercano, visual, con analogías del mundo real
+
+### PALETA CORPORATIVA (OBLIGATORIO - usar estos colores exactos)
+- Primary: #003e3c (verde azulado oscuro) - para títulos y elementos principales
+- Primary Light: #015251 (verde azulado claro) - para acentos secundarios
+- Accent: #e35336 (coral/naranja) - para alertas, urgencias y CTAs
+- Accent Dark: #c44729 (coral oscuro) - para hover/interacción
+- Surface: #f8f5f2 (beige claro) - fondos suaves
+- Text: #1a1a1a (casi negro) - cuerpo de texto
+- Text Muted: #6b7280 (gris) - etiquetas y secundario
+
+### REQUISITOS DE SALIDA
+1. **Formato:** Markdown con estructura de diapositivas (una sección por slide)
+2. **Número de slides:** 20-25 diapositivas (visual, no denso)
+3. **Estructura:** Cada slide debe incluir:
+   - Número de slide
+   - Título (H2)
+   - Contenido visual recomendado (descripción de iconos, fotos, diagramas)
+   - Puntos de texto (máximo 3-4 por slide, breves)
+   - Speaker notes (notas del presentador - completas, del guión original)
+
+4. **Elementos visuales:** Usar descripción de:
+   - Iconos (especificar estilo: outline, filled, colorful)
+   - Gráficos/diagramas (ASCII art si es posible, o descripción clara)
+   - Imágenes de stock (especificar: "foto de X" o "ilustración de Y")
+   - Tablas comparativas cuando sea relevante
+   - Fondos y composición visual
+
+5. **Estilo de diseño:**
+   - Minimalista corporativo con toque moderno
+   - Mucho espacio en blanco
+   - Tipografía clara (sans-serif)
+   - Máximo 2-3 elementos visuales por slide
+   - Consistency visual en toda la presentación
+
+### ESTRUCTURA DE SLIDES (por bloques del guión)
+
+**BLOQUE 0 - Portada (1 slide)**
+- Impactante, con logo/branding
+- Título principal: "Terranova: El Arquitecto Proptech"
+
+**BLOQUE 1 - El Problema (2-3 slides)**
+- Slide 1: La historia (caos de mensajes)
+- Slide 2: El impacto (pérdida del 60% de ventas)
+- Considera: Una analogía visual (hospital/urgencias)
+
+**BLOQUE 2 - La Solución en Conceptos (4-5 slides)**
+- Slide 1: Flujo general (Centralización → IA → Dashboard)
+- Slide 2: Paso 1 (Centralización - una puerta, 3 canales)
+- Slide 3: Paso 2 (IA - clasificación en 3 dimensiones)
+- Slide 4: Paso 3 (Acciones según puntuación)
+- Slide 5: Tabla comparativa de puntajes (0-100) con colores:
+  - >70 (Rojo/Accent) = Urgente
+  - 40-70 (Amarillo) = Medio
+  - <40 (Azul) = Bajo
+  - Spam = Gris
+
+**BLOQUE 3 - Demo Visual (sustituida por video) (1 slide)**
+- Slide: "Demo en vivo" (mostrar placeholder para video)
+- Señalar: Este video muestra las 3 fases en acción
+
+**BLOQUE 4 - Cómo Funciona (3-4 slides)**
+- Slide 1: Capas de la arquitectura (diagrama: Canales → IA → Dashboard)
+- Slide 2: La IA explicada (GPT-4o-mini, menos de 1 segundo)
+- Slide 3: Deduplicación (misma persona ≠ múltiples fichas)
+- Slide 4: Seguridad (encriptación AES-256, rate limiting)
+
+**BLOQUE 5 - Impacto y Números (2-3 slides)**
+- Slide 1: Tabla "Antes vs Después"
+- Slide 2: Métrica clave: del 60% pérdida al ~100% captura
+- Slide 3: ROI visual (opcional: gráfico de impacto)
+
+**BLOQUE 6 - Cierre (2 slides)**
+- Slide 1: Resumen en una frase (con iconografía fuerte)
+- Slide 2: CTA + Preguntas frecuentes (FAQ en 4 puntos)
+
+### INSTRUCCIONES DE DISEÑO ESPECÍFICAS
+
+1. **Títulos:** Color Primary (#003e3c), bold, 40-48px, máximo 8 palabras
+2. **Subtítulos:** Color Primary Light (#015251), 28px
+3. **Body text:** Color Text (#1a1a1a), 18-20px, máximo 4 líneas por punto
+4. **Highlights:** Color Accent (#e35336) para números, alertas, CTAs
+5. **Fondos:** Alternar entre blanco puro y Surface (#f8f5f2)
+6. **Divisores:** Línea fina en Primary (#003e3c), no más de 2px
+7. **Íconos:** 40-60px, estilo "outline" o "filled", del color Primary o Accent según contexto
+8. **Espaciado:** Padding mínimo 60px arriba/abajo, 80px izquierda/derecha
+
+### TONE & VOICE PARA SPEAKER NOTES
+- Directo, sin jerga
+- Analogías del mundo real (hospital, recepción, triaje)
+- Énfasis en el problema primero, solución después
+- Números concretos: 60% pérdida, 85 puntos, <1 segundo, $0.15/millón tokens
+
+### NOTAS FINALES
+- Cada slide debe ser autoexplicativa (sin el presentador)
+- Las speaker notes deben permitir que alguien más dé la presentación
+- Incluye transiciones sugeridas (fade, slide) solo si es relevante
+- Marca dónde va el video: [INSERTAR VIDEO DE DEMO - 2 minutos]

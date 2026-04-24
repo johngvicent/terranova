@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getFeaturedProperties } from "@/lib/data";
 import PropertyCard from "@/components/PropertyCard";
 import SectionHeading from "@/components/SectionHeading";
+import HeroVideoSlider from "@/components/HeroVideoSlider";
 
 export default function HomePage() {
   const featured = getFeaturedProperties();
@@ -11,30 +12,21 @@ export default function HomePage() {
     <>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80"
-          alt="Paisaje natural de España"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#003e3c]/70 via-[#003e3c]/50 to-[#003e3c]/80" />
+        <HeroVideoSlider />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center text-white">
-          <p className="text-[#e35336] font-semibold text-sm sm:text-base uppercase tracking-widest mb-4">
+          <p className="text-[#fafafa] font-semibold text-sm sm:text-base uppercase tracking-widest mb-4" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.55)' }}>
             Inmobiliaria de naturaleza
           </p>
           <h1
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6"
-            style={{ fontFamily: "var(--font-raleway), sans-serif" }}
+            style={{ fontFamily: "var(--font-raleway), sans-serif", textShadow: '0 3px 14px rgba(0,0,0,0.65)' }}
           >
             Encuentra tu refugio
             <br />
             <span className="text-[#e35336]">en la naturaleza</span>
           </h1>
-          <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-10">
+          <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-10" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.60)' }}>
             Propiedades exclusivas de venta y alquiler en los destinos turísticos
             naturales más espectaculares de España.
           </p>
@@ -115,7 +107,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80"
+                src="https://images.unsplash.com/photo-1596279578030-de258a2ece01?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Equipo Terranova"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -165,10 +157,10 @@ export default function HomePage() {
           />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-12">
             {[
-              { name: "Costa Brava", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" },
-              { name: "Mallorca", img: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=80" },
-              { name: "Asturias", img: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&q=80" },
-              { name: "Sierra Nevada", img: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&q=80" },
+              { name: "Costa Brava", img: "https://images.unsplash.com/photo-1570086874018-caf58122decd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+              { name: "Mallorca", img: "https://images.unsplash.com/photo-1617350526945-9eb810f8ac65?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+              { name: "Asturias", img: "https://images.unsplash.com/photo-1765100482634-beb4606704eb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+              { name: "Sierra Nevada", img: "https://images.unsplash.com/photo-1740744664511-657801dd9d11?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
               { name: "Ibiza", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" },
               { name: "Pirineos", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" },
             ].map(({ name, img }) => (
