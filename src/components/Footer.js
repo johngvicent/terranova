@@ -3,11 +3,15 @@ import Image from "next/image";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const legalLinks = [
+    { href: "/politica-privacidad", label: "Política de privacidad" },
+    { href: "/politica-cookies", label: "Política de cookies" },
+  ];
 
   return (
     <footer className="bg-[#003e3c] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-5">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" aria-label="Terranova – inicio">
@@ -68,6 +72,24 @@ export default function Footer() {
             </ul>
           </div>
 
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-white/50 mb-4">
+              Legal
+            </h3>
+            <ul className="space-y-2">
+              {legalLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-white/70 hover:text-[#e35336] text-sm transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-widest text-white/50 mb-4">
@@ -99,8 +121,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col gap-4 text-xs text-white/40 lg:flex-row lg:items-center lg:justify-between">
           <p>© {year} John Vicent. Todos los derechos reservados.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:justify-start lg:justify-center">
+            {legalLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
           <p>Diseño y desarrollo con ♥ en España</p>
         </div>
       </div>
