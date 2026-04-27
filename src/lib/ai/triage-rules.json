@@ -1,0 +1,152 @@
+{
+  "intentKeywords": {
+    "COMPRA": [
+      "busco",
+      "comprar",
+      "quiero comprar",
+      "adquirir",
+      "presupuesto",
+      "cerrar",
+      "casa",
+      "villa",
+      "apartamento",
+      "piso",
+      "finca",
+      "masia",
+      "masía",
+      "casa rural"
+    ],
+    "ALQUILER": [
+      "alquilar",
+      "alquiler",
+      "arrendar",
+      "rentar",
+      "vacacional",
+      "por meses",
+      "mensual",
+      "temporada"
+    ],
+    "VENTA": [
+      "vender",
+      "vendo",
+      "quiero vender",
+      "poner en venta",
+      "tasar",
+      "mi propiedad",
+      "mi casa",
+      "mi piso"
+    ],
+    "INFORMACION": [
+      "informacion",
+      "información",
+      "que ofrecen",
+      "qué ofrecen",
+      "consulta",
+      "catalogo",
+      "catálogo",
+      "disponibilidad",
+      "precios",
+      "opciones"
+    ],
+    "SPAM": [
+      "seo",
+      "casino",
+      "crypto",
+      "viagra",
+      "guest post",
+      "backlinks",
+      "linkbuilding",
+      "marketing masivo"
+    ]
+  },
+  "urgencySignals": {
+    "ALTA": [
+      "urgente",
+      "esta semana",
+      "este mes",
+      "cuanto antes",
+      "cuanto antes posible",
+      "lo antes posible",
+      "antes de verano",
+      "para julio",
+      "para agosto",
+      "cerrar pronto",
+      "inmediato"
+    ],
+    "MEDIA": [
+      "proximamente",
+      "próximamente",
+      "en los proximos meses",
+      "en los próximos meses",
+      "este ano",
+      "este año",
+      "me interesa",
+      "estoy buscando",
+      "quisiera",
+      "querria",
+      "querría"
+    ],
+    "BAJA": [
+      "sin prisa",
+      "solo mirando",
+      "a futuro",
+      "por curiosidad",
+      "mas adelante",
+      "más adelante",
+      "explorando",
+      "valorando opciones"
+    ]
+  },
+  "propertySignals": [
+    "habitaciones",
+    "habitacion",
+    "hab",
+    "dormitorios",
+    "dormitorio",
+    "baños",
+    "banos",
+    "baño",
+    "bano",
+    "terraza",
+    "jardin",
+    "jardín",
+    "piscina",
+    "casa rural",
+    "apartamento",
+    "piso",
+    "chalet",
+    "villa",
+    "finca",
+    "masia",
+    "masía"
+  ],
+  "zones": [
+    { "name": "Costa Brava", "aliases": ["costa brava", "girona"] },
+    { "name": "Mallorca", "aliases": ["mallorca", "soller", "sóller"] },
+    { "name": "Asturias", "aliases": ["asturias", "llanes"] },
+    { "name": "Sierra Nevada", "aliases": ["sierra nevada", "granada"] },
+    { "name": "Menorca", "aliases": ["menorca", "cala morell"] },
+    { "name": "Cantabria", "aliases": ["cantabria", "potes", "picos de europa"] },
+    { "name": "Ibiza", "aliases": ["ibiza", "santa eularia", "santa eulária"] },
+    { "name": "Pirineos", "aliases": ["pirineos", "valle de aran", "valle de arán", "baqueira"] },
+    { "name": "Cataluña", "aliases": ["cataluna", "cataluña", "lleida", "girona"] },
+    { "name": "Baleares", "aliases": ["baleares"] },
+    { "name": "Andalucía", "aliases": ["andalucia", "andalucía", "granada"] }
+  ],
+  "scoreWeights": {
+    "transactionIntent": 25,
+    "informationalIntent": 18,
+    "budget": 20,
+    "zone": 12,
+    "highUrgencyTimeline": 18,
+    "mediumUrgencyTimeline": 10,
+    "propertyDetails": 10
+  },
+  "summaryLabels": {
+    "COMPRA": "Lead de compra",
+    "ALQUILER": "Lead de alquiler",
+    "VENTA": "Lead de venta",
+    "INFORMACION": "Consulta general",
+    "SPAM": "Mensaje potencialmente irrelevante"
+  }
+}

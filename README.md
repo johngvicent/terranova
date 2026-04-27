@@ -161,7 +161,8 @@ Copia `.env.example` a `.env.local` y rellena cada valor:
 |----------|-------------|----------------|
 | `DATABASE_URL` | Connection string de PostgreSQL | Supabase → Settings → Database → URI |
 | `ENCRYPTION_KEY` | Clave AES-256 (64 chars hex) | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `OPENAI_API_KEY` | API key de OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| `TRIAGE_MODE` | Modo del triaje: `auto`, `local` u `openai` | Usa `local` para demos sin coste |
+| `OPENAI_API_KEY` | API key de OpenAI | Opcional si `TRIAGE_MODE=local`; obligatoria para triaje real con GPT |
 | `AUTH_SECRET` | Secreto para firmar tokens JWT | `npx auth secret` |
 | `WHATSAPP_TOKEN` | Token de acceso de WhatsApp Business | Meta Developer Console → WhatsApp → API Setup |
 | `WHATSAPP_VERIFY_TOKEN` | Token personalizado para verificar el webhook | Inventar uno propio |

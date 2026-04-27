@@ -3,6 +3,7 @@ import {
   CLASSIFIER_SYSTEM_PROMPT,
   buildClassifierUserPrompt,
 } from "./prompts.js";
+import { classifyLeadLocally } from "./local-classifier.js";
 
 let _openai;
 function getOpenAI() {
@@ -19,19 +20,34 @@ function getOpenAI() {
  * @returns {Promise<{ intencion: string, urgencia: string, score: number, presupuesto: number|null, zona: string|null, resumen: string }>}
  */
 export async function classifyLead({ mensaje, interes, canal }) {
-  // If no API key, return a default classification
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn("[classifyLead] No OPENAI_API_KEY set, using defaults");
-    return {
-      intencion: mapInteresToIntencion(interes),
-      urgencia: "MEDIA",
-      score: 50,
-      presupuesto: null,
-      zona: null,
-      resumen: mensaje.slice(0, 200),
-    };
+  const triageMode = getTriageMode();
+  const fallbackIntencion = mapInteresToIntencion(interes);
+
+  if (triageMode === "local") {
+    return classifyLeadLocally({ mensaje, fallbackIntencion, canal });
   }
 
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn("[classifyLead] No OPENAI_API_KEY set, using local rules");
+    return classifyLeadLocally({ mensaje, fallbackIntencion, canal });
+  }
+
+  try {
+    return await classifyLeadWithOpenAI({ mensaje, interes, canal });
+  } catch (error) {
+    if (triageMode === "openai") {
+      throw error;
+    }
+
+    console.warn(
+      "[classifyLead] OpenAI classification failed, using local rules",
+      error
+    );
+    return classifyLeadLocally({ mensaje, fallbackIntencion, canal });
+  }
+}
+
+async function classifyLeadWithOpenAI({ mensaje, interes, canal }) {
   const completion = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     temperature: 0.1,
@@ -75,6 +91,11 @@ export async function classifyLead({ mensaje, interes, canal }) {
     zona: parsed.zona ?? null,
     resumen: (parsed.resumen || mensaje.slice(0, 200)).slice(0, 500),
   };
+}
+
+function getTriageMode() {
+  const mode = process.env.TRIAGE_MODE?.toLowerCase();
+  return ["auto", "local", "openai"].includes(mode) ? mode : "auto";
 }
 
 function mapInteresToIntencion(interes) {
