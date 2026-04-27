@@ -34,6 +34,52 @@ function getStaticCatalogProperties() {
   }));
 }
 
+function getStaticPropertyBySlug(slug) {
+  return getStaticCatalogProperties().find((property) => property.id === slug) ?? null;
+}
+
+function isDatabaseConnectionError(error) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  if (error.code === "P1001" || error.code === "P1017") {
+    return true;
+  }
+
+  const messages = [
+    error.message,
+    error.meta?.driverAdapterError?.message,
+    error.meta?.driverAdapterError?.cause?.message,
+    error.cause?.message,
+  ].filter((value) => typeof value === "string");
+
+  return messages.some((message) =>
+    [
+      "Connection terminated unexpectedly",
+      "Can't reach database server",
+      "DatabaseNotReachable",
+      "ECONNREFUSED",
+      "ECONNRESET",
+      "ENOTFOUND",
+      "terminating connection",
+    ].some((fragment) => message.includes(fragment))
+  );
+}
+
+async function withStaticCatalogFallback(operation, fallback) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (!isDatabaseConnectionError(error)) {
+      throw error;
+    }
+
+    console.error("[properties] Falling back to static catalog", error);
+    return fallback();
+  }
+}
+
 async function ensurePropertyCatalogSeeded() {
   const existingCatalogProperties = await prisma.property.findMany({
     where: { slug: { in: catalogSlugs } },
@@ -70,17 +116,22 @@ export async function getFeaturedProperties() {
     return getStaticCatalogProperties().filter((property) => property.featured);
   }
 
-  await ensurePropertyCatalogSeeded();
+  return withStaticCatalogFallback(
+    async () => {
+      await ensurePropertyCatalogSeeded();
 
-  const properties = await prisma.property.findMany({
-    where: {
-      isListed: true,
-      featured: true,
+      const properties = await prisma.property.findMany({
+        where: {
+          isListed: true,
+          featured: true,
+        },
+        orderBy: [{ updatedAt: "desc" }, { title: "asc" }],
+      });
+
+      return properties.map(toClientProperty);
     },
-    orderBy: [{ updatedAt: "desc" }, { title: "asc" }],
-  });
-
-  return properties.map(toClientProperty);
+    () => getStaticCatalogProperties().filter((property) => property.featured)
+  );
 }
 
 export async function getListedProperties() {
@@ -88,14 +139,19 @@ export async function getListedProperties() {
     return getStaticCatalogProperties();
   }
 
-  await ensurePropertyCatalogSeeded();
+  return withStaticCatalogFallback(
+    async () => {
+      await ensurePropertyCatalogSeeded();
 
-  const properties = await prisma.property.findMany({
-    where: { isListed: true },
-    orderBy: [{ featured: "desc" }, { updatedAt: "desc" }, { title: "asc" }],
-  });
+      const properties = await prisma.property.findMany({
+        where: { isListed: true },
+        orderBy: [{ featured: "desc" }, { updatedAt: "desc" }, { title: "asc" }],
+      });
 
-  return properties.map(toClientProperty);
+      return properties.map(toClientProperty);
+    },
+    () => getStaticCatalogProperties()
+  );
 }
 
 export async function getCatalogProperties() {
@@ -103,20 +159,23 @@ export async function getCatalogProperties() {
     return getStaticCatalogProperties();
   }
 
-  await ensurePropertyCatalogSeeded();
+  return withStaticCatalogFallback(
+    async () => {
+      await ensurePropertyCatalogSeeded();
 
-  const properties = await prisma.property.findMany({
-    orderBy: [{ isListed: "desc" }, { featured: "desc" }, { title: "asc" }],
-  });
+      const properties = await prisma.property.findMany({
+        orderBy: [{ isListed: "desc" }, { featured: "desc" }, { title: "asc" }],
+      });
 
-  return properties.map(toClientProperty);
+      return properties.map(toClientProperty);
+    },
+    () => getStaticCatalogProperties()
+  );
 }
 
 export async function getPropertyBySlug(slug, { includeUnlisted = false } = {}) {
   if (!hasDatabaseConfig()) {
-    const property = getStaticCatalogProperties().find(
-      (candidate) => candidate.id === slug
-    );
+    const property = getStaticPropertyBySlug(slug);
 
     if (!property) {
       return null;
@@ -129,19 +188,36 @@ export async function getPropertyBySlug(slug, { includeUnlisted = false } = {}) 
     return property;
   }
 
-  await ensurePropertyCatalogSeeded();
+  return withStaticCatalogFallback(
+    async () => {
+      await ensurePropertyCatalogSeeded();
 
-  const property = await prisma.property.findUnique({
-    where: { slug },
-  });
+      const property = await prisma.property.findUnique({
+        where: { slug },
+      });
 
-  if (!property) {
-    return null;
-  }
+      if (!property) {
+        return null;
+      }
 
-  if (!includeUnlisted && !property.isListed) {
-    return null;
-  }
+      if (!includeUnlisted && !property.isListed) {
+        return null;
+      }
 
-  return toClientProperty(property);
+      return toClientProperty(property);
+    },
+    () => {
+      const property = getStaticPropertyBySlug(slug);
+
+      if (!property) {
+        return null;
+      }
+
+      if (!includeUnlisted && property.isListed === false) {
+        return null;
+      }
+
+      return property;
+    }
+  );
 }
