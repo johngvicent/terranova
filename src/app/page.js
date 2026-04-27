@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getFeaturedProperties } from "@/lib/data";
+import { getFeaturedProperties } from "@/lib/properties";
 import PropertyCard from "@/components/PropertyCard";
 import SectionHeading from "@/components/SectionHeading";
 import HeroVideoSlider from "@/components/HeroVideoSlider";
 
-export default function HomePage() {
-  const featured = getFeaturedProperties();
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const featured = await getFeaturedProperties();
 
   return (
     <>
@@ -98,6 +100,11 @@ export default function HomePage() {
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
+          {featured.length === 0 && (
+            <p className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-[#6b7280]">
+              No hay propiedades destacadas publicadas en este momento.
+            </p>
+          )}
         </div>
       </section>
 

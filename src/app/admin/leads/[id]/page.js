@@ -4,11 +4,64 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
+const QUICK_REPLY_TEMPLATES = [
+  {
+    id: "seguimiento",
+    label: "Seguimiento inicial",
+    description: "Agradece el contacto y abre la conversación.",
+    subject: "Seguimiento de tu consulta en Terranova",
+    buildMessage: (lead) => `Hola ${lead?.nombre || ""},\n\nGracias por escribirnos. Hemos recibido tu consulta y ya estamos revisando la mejor manera de ayudarte con tu búsqueda.\n\nSi te parece, podemos continuar por este mismo correo o coordinar una llamada breve para orientarte mejor.\n\nUn saludo,\nEquipo Terranova`,
+  },
+  {
+    id: "mas-informacion",
+    label: "Pedir más información",
+    description: "Solicita zona, plazo o tipo de operación.",
+    subject: "Necesitamos un poco más de información",
+    buildMessage: (lead) => `Hola ${lead?.nombre || ""},\n\nGracias por tu interés. Para enviarte opciones mejor ajustadas, ¿podrías indicarnos la zona que te interesa, si buscas compra o alquiler y tu plazo aproximado?\n\nCon esos datos te responderemos con una propuesta mucho más precisa.\n\nUn saludo,\nEquipo Terranova`,
+  },
+  {
+    id: "llamada",
+    label: "Proponer llamada",
+    description: "Invita a cerrar una llamada breve.",
+    subject: "¿Agendamos una llamada rápida?",
+    buildMessage: (lead) => `Hola ${lead?.nombre || ""},\n\nPodemos resolver tus dudas en una llamada breve y ayudarte a avanzar más rápido. Si te encaja, envíanos dos franjas horarias que te vengan bien y te confirmamos una de ellas.\n\nQuedamos atentos.\n\nUn saludo,\nEquipo Terranova`,
+  },
+  {
+    id: "alternativas",
+    label: "Ofrecer alternativas",
+    description: "Abre la puerta a otras opciones similares.",
+    subject: "Opciones que podrían encajarte",
+    buildMessage: (lead) => `Hola ${lead?.nombre || ""},\n\nEstamos revisando opciones que encajen con lo que nos has comentado. En cuanto confirmemos disponibilidad y detalles, te enviaremos una selección priorizada para que puedas valorar las mejores alternativas.\n\nSi hay alguna preferencia clave, puedes responder a este correo y la tendremos en cuenta.\n\nUn saludo,\nEquipo Terranova`,
+  },
+];
+
+function buildDefaultSubject(lead) {
+  const inboundEmail = lead?.mensajes?.find(
+    (message) => message.canal === "EMAIL" && message.direccion === "INBOUND"
+  );
+  const inboundSubject = inboundEmail?.metadata?.subject;
+
+  if (typeof inboundSubject === "string" && inboundSubject.trim()) {
+    return inboundSubject.toLowerCase().startsWith("re:")
+      ? inboundSubject
+      : `Re: ${inboundSubject}`;
+  }
+
+  return `Respuesta a tu consulta en Terranova`;
+}
+
 export default function LeadDetailPage() {
   const { id } = useParams();
   const [lead, setLead] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [replySubject, setReplySubject] = useState("");
+  const [replyMessage, setReplyMessage] = useState("");
+  const [replyState, setReplyState] = useState("idle");
+  const [replyError, setReplyError] = useState("");
+
+  const isReplyInvalid =
+    replyState === "sending" || !replySubject.trim() || !replyMessage.trim();
 
   useEffect(() => {
     fetchLead();
@@ -18,7 +71,9 @@ export default function LeadDetailPage() {
     try {
       const res = await fetch(`/api/leads/${id}`);
       if (res.ok) {
-        setLead(await res.json());
+        const data = await res.json();
+        setLead(data);
+        setReplySubject((current) => current || buildDefaultSubject(data));
       }
     } catch (err) {
       console.error("Error fetching lead:", err);
@@ -45,6 +100,51 @@ export default function LeadDetailPage() {
     }
   }
 
+  async function sendReply(e) {
+    e.preventDefault();
+
+    if (!lead?.email) {
+      setReplyState("error");
+      setReplyError("Este lead no tiene email disponible para responder.");
+      return;
+    }
+
+    setReplyState("sending");
+    setReplyError("");
+
+    try {
+      const res = await fetch(`/api/leads/${id}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: replySubject,
+          mensaje: replyMessage,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "No se pudo enviar la respuesta");
+      }
+
+      setLead(result);
+      setReplyMessage("");
+      setReplySubject(buildDefaultSubject(result));
+      setReplyState("success");
+    } catch (err) {
+      setReplyState("error");
+      setReplyError(err.message || "No se pudo enviar la respuesta");
+    }
+  }
+
+  function applyQuickReply(template) {
+    setReplySubject(template.subject);
+    setReplyMessage(template.buildMessage(lead));
+    setReplyState("idle");
+    setReplyError("");
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64 text-text-muted">
@@ -63,6 +163,8 @@ export default function LeadDetailPage() {
       </div>
     );
   }
+
+  const quickReplies = QUICK_REPLY_TEMPLATES;
 
   return (
     <div>
@@ -177,6 +279,116 @@ export default function LeadDetailPage() {
               )}
             </div>
           </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-sm font-semibold text-text">
+                  Responder por email
+                </h2>
+                <p className="text-sm text-text-muted mt-1">
+                  La respuesta se enviará a {lead.email || "este lead"} y quedará registrada en el historial.
+                </p>
+              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-800">
+                EMAIL
+              </span>
+            </div>
+
+            {!lead.email ? (
+              <p className="text-sm text-text-muted">
+                Este lead no tiene un email disponible. Puedes contactarle por teléfono si está informado.
+              </p>
+            ) : (
+              <form onSubmit={sendReply} className="space-y-4">
+                <div className="rounded-2xl border border-[#d9cec0] bg-[#f7f1e8] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-text">
+                        Respuestas rápidas
+                      </p>
+                      <p className="mt-1 text-xs text-text-muted">
+                        Selecciona una base editable para acelerar la respuesta.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6d645c]">
+                      Plantillas
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {quickReplies.map((template) => (
+                      <button
+                        key={template.id}
+                        type="button"
+                        onClick={() => applyQuickReply(template)}
+                        className="rounded-2xl border border-[#d9cec0] bg-white px-4 py-3 text-left transition-colors hover:border-[#0b3b3b] hover:bg-[#fffaf3]"
+                      >
+                        <div className="text-sm font-semibold text-text">
+                          {template.label}
+                        </div>
+                        <div className="mt-1 text-xs leading-5 text-text-muted">
+                          {template.description}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1.5">
+                    Asunto
+                  </label>
+                  <input
+                    value={replySubject}
+                    onChange={(e) => {
+                      setReplySubject(e.target.value);
+                      setReplyState("idle");
+                      setReplyError("");
+                    }}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white"
+                    placeholder="Asunto del correo"
+                    maxLength={200}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1.5">
+                    Mensaje
+                  </label>
+                  <textarea
+                    value={replyMessage}
+                    onChange={(e) => {
+                      setReplyMessage(e.target.value);
+                      setReplyState("idle");
+                      setReplyError("");
+                    }}
+                    rows={6}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white resize-none"
+                    placeholder="Escribe aquí la respuesta para el cliente"
+                    maxLength={5000}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="text-xs text-text-muted">
+                    {replyState === "success"
+                      ? "Correo enviado correctamente."
+                      : replyState === "error"
+                        ? replyError
+                        : ""}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isReplyInvalid}
+                    className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition-colors disabled:opacity-60"
+                  >
+                    {replyState === "sending" ? "Enviando..." : "Enviar respuesta"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* Sidebar */}
@@ -225,16 +437,23 @@ export default function LeadDetailPage() {
             </h3>
             <div className="space-y-2 text-sm">
               {lead.email && (
-                <p className="text-text-muted">
+                <p className="text-text-muted break-all">
                   <span className="font-medium text-text">Email:</span>{" "}
-                  {lead.email}
+                  <a href={`mailto:${lead.email}`} className="text-primary hover:underline">
+                    {lead.email}
+                  </a>
                 </p>
               )}
               {lead.telefono && (
                 <p className="text-text-muted">
                   <span className="font-medium text-text">Teléfono:</span>{" "}
-                  {lead.telefono}
+                  <a href={`tel:${lead.telefono}`} className="text-primary hover:underline">
+                    {lead.telefono}
+                  </a>
                 </p>
+              )}
+              {!lead.email && !lead.telefono && (
+                <p className="text-text-muted">No hay datos de contacto disponibles.</p>
               )}
             </div>
           </div>

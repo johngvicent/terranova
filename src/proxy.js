@@ -6,6 +6,7 @@ const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
+  const isPublicLeadCreate = pathname === "/api/leads" && req.method === "POST";
 
   // Protect /admin routes (except /admin/login)
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
@@ -21,7 +22,7 @@ export default auth((req) => {
   if (
     pathname.startsWith("/api/leads") &&
     !pathname.startsWith("/api/webhooks") &&
-    req.method !== "POST"
+    !isPublicLeadCreate
   ) {
     if (!req.auth) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });

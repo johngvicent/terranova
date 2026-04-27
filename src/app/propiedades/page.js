@@ -1,5 +1,6 @@
 import SectionHeading from "@/components/SectionHeading";
 import PropertyListings from "@/components/PropertyListings";
+import { getListedProperties } from "@/lib/properties";
 
 export const metadata = {
   title: "Propiedades",
@@ -7,7 +8,11 @@ export const metadata = {
     "Explora todas las propiedades de venta y alquiler en destinos naturales de España — Costa Brava, Mallorca, Asturias, Sierra Nevada, Pirineos y más.",
 };
 
-export default function PropiedadesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PropiedadesPage() {
+  const properties = await getListedProperties();
+
   return (
     <>
       {/* Page header */}
@@ -24,7 +29,7 @@ export default function PropiedadesPage() {
       {/* Listings */}
       <section className="py-16 bg-[#f8f5f2] min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <PropertyListings />
+          <PropertyListings properties={properties} />
         </div>
       </section>
     </>

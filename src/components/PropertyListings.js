@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { getPropertiesByType } from "@/lib/data";
 import PropertyCard from "@/components/PropertyCard";
 
 const filters = [
@@ -10,9 +9,18 @@ const filters = [
   { value: "alquiler", label: "En alquiler" },
 ];
 
-export default function PropertyListings() {
+export default function PropertyListings({ properties }) {
   const [active, setActive] = useState("todos");
-  const properties = getPropertiesByType(active);
+  const filteredProperties =
+    active === "todos"
+      ? properties
+      : properties.filter((property) => property.type === active);
+
+  const counts = {
+    todos: properties.length,
+    venta: properties.filter((property) => property.type === "venta").length,
+    alquiler: properties.filter((property) => property.type === "alquiler").length,
+  };
 
   return (
     <>
@@ -30,7 +38,7 @@ export default function PropertyListings() {
           >
             {label}
             <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${active === value ? "bg-white/20 text-white" : "bg-[#f8f5f2] text-[#6b7280]"}`}>
-              {getPropertiesByType(value).length}
+              {counts[value]}
             </span>
           </button>
         ))}
@@ -38,12 +46,12 @@ export default function PropertyListings() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {properties.map((property) => (
+        {filteredProperties.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}
       </div>
 
-      {properties.length === 0 && (
+      {filteredProperties.length === 0 && (
         <p className="text-center text-[#6b7280] py-20">
           No hay propiedades disponibles en esta categoría.
         </p>

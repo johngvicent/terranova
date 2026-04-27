@@ -114,6 +114,7 @@ model Property {
   bathrooms   Int
   area        Int
   image       String
+  isListed    Boolean      @default(true)
   featured    Boolean      @default(false)
   tags        String[]
 

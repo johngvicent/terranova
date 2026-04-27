@@ -1,15 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPropertyById, properties, formatPrice } from "@/lib/data";
+import { formatPrice } from "@/lib/data";
+import { getPropertyBySlug } from "@/lib/properties";
 
-export async function generateStaticParams() {
-  return properties.map((p) => ({ id: p.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const property = getPropertyById(id);
+  const property = await getPropertyBySlug(id);
   if (!property) return {};
   return {
     title: property.title,
@@ -19,7 +18,7 @@ export async function generateMetadata({ params }) {
 
 export default async function PropertyDetailPage({ params }) {
   const { id } = await params;
-  const property = getPropertyById(id);
+  const property = await getPropertyBySlug(id);
   if (!property) notFound();
 
   const {

@@ -3,6 +3,7 @@ import { createLeadSchema } from "@/lib/validations";
 import { formLimiter, apiLimiter } from "@/lib/ratelimit";
 import { classifyLead } from "@/lib/ai/classifier";
 import { encrypt } from "@/lib/crypto";
+import { serializeLeadForAdmin } from "@/lib/leads/admin";
 
 /**
  * POST /api/leads — Create a new lead from the web contact form.
@@ -57,7 +58,7 @@ export async function POST(request) {
             contenido: mensaje,
             canal: "WEB",
             direccion: "INBOUND",
-            metadata: { interes, emailPlain: email || null },
+            metadata: { interes },
           },
         },
       },
@@ -131,7 +132,7 @@ export async function GET(request) {
     ]);
 
     return Response.json({
-      leads,
+      leads: leads.map(serializeLeadForAdmin),
       pagination: {
         page,
         limit,

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { serializeLeadForAdmin } from "@/lib/leads/admin";
 import { updateLeadSchema } from "@/lib/validations";
 
 /**
@@ -20,7 +21,7 @@ export async function GET(_request, { params }) {
       return Response.json({ error: "Lead no encontrado" }, { status: 404 });
     }
 
-    return Response.json(lead);
+    return Response.json(serializeLeadForAdmin(lead));
   } catch (error) {
     console.error("[GET /api/leads/[id]]", error);
     return Response.json(

@@ -55,3 +55,20 @@ export const updateLeadSchema = z.object({
     .optional(),
   agenteId: z.string().cuid().optional().nullable(),
 });
+
+export const updatePropertyListingSchema = z.object({
+  isListed: z.boolean(),
+});
+
+export const sendLeadReplySchema = z.object({
+  subject: z
+    .string()
+    .trim()
+    .min(1, "El asunto es obligatorio")
+    .max(200, "Máximo 200 caracteres"),
+  mensaje: z
+    .string()
+    .trim()
+    .min(1, "El mensaje es obligatorio")
+    .max(5000, "Máximo 5000 caracteres"),
+});
