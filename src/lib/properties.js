@@ -1,6 +1,6 @@
 import "server-only";
 
-import { prisma } from "@/lib/prisma";
+import { hasDatabaseConfig, prisma } from "@/lib/prisma";
 import { properties as propertyCatalog } from "@/lib/data";
 
 const catalogSlugs = propertyCatalog.map((property) => property.id);
@@ -24,6 +24,14 @@ function toClientProperty(property) {
     id: property.slug,
     type: clientTypeByDbType[property.type] ?? property.type?.toLowerCase?.(),
   };
+}
+
+function getStaticCatalogProperties() {
+  return propertyCatalog.map((property) => ({
+    ...property,
+    recordId: property.id,
+    isListed: true,
+  }));
 }
 
 async function ensurePropertyCatalogSeeded() {
@@ -58,6 +66,10 @@ async function ensurePropertyCatalogSeeded() {
 }
 
 export async function getFeaturedProperties() {
+  if (!hasDatabaseConfig()) {
+    return getStaticCatalogProperties().filter((property) => property.featured);
+  }
+
   await ensurePropertyCatalogSeeded();
 
   const properties = await prisma.property.findMany({
@@ -72,6 +84,10 @@ export async function getFeaturedProperties() {
 }
 
 export async function getListedProperties() {
+  if (!hasDatabaseConfig()) {
+    return getStaticCatalogProperties();
+  }
+
   await ensurePropertyCatalogSeeded();
 
   const properties = await prisma.property.findMany({
@@ -83,6 +99,10 @@ export async function getListedProperties() {
 }
 
 export async function getCatalogProperties() {
+  if (!hasDatabaseConfig()) {
+    return getStaticCatalogProperties();
+  }
+
   await ensurePropertyCatalogSeeded();
 
   const properties = await prisma.property.findMany({
@@ -93,6 +113,22 @@ export async function getCatalogProperties() {
 }
 
 export async function getPropertyBySlug(slug, { includeUnlisted = false } = {}) {
+  if (!hasDatabaseConfig()) {
+    const property = getStaticCatalogProperties().find(
+      (candidate) => candidate.id === slug
+    );
+
+    if (!property) {
+      return null;
+    }
+
+    if (!includeUnlisted && property.isListed === false) {
+      return null;
+    }
+
+    return property;
+  }
+
   await ensurePropertyCatalogSeeded();
 
   const property = await prisma.property.findUnique({
