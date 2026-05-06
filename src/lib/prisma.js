@@ -5,14 +5,31 @@ const globalForPrisma = globalThis;
 const MISSING_DB_ERROR =
   "Missing database connection string. Set DATABASE_URL or provide a compatible Vercel Postgres variable.";
 
+function firstNonEmpty(...values) {
+  return values.find((value) => typeof value === "string" && value.length > 0);
+}
+
 function getConfiguredDatabaseUrl() {
-  return (
-    process.env.DATABASE_URL ??
-    process.env.DIRECT_URL ??
-    process.env.POSTGRES_PRISMA_URL ??
-    process.env.POSTGRES_URL_NON_POOLING ??
-    process.env.POSTGRES_URL
+  const vercelManagedUrl = firstNonEmpty(
+    process.env.POSTGRES_URL_NON_POOLING,
+    process.env.POSTGRES_DATABASE_URL_UNPOOLED,
+    process.env.POSTGRES_URL,
+    process.env.POSTGRES_DATABASE_URL,
+    process.env.POSTGRES_PRISMA_URL
   );
+
+  const genericUrl = firstNonEmpty(
+    process.env.DATABASE_URL,
+    process.env.DIRECT_URL
+  );
+
+  // On Vercel, prefer the Storage integration URLs over any older manual
+  // DATABASE_URL that may still exist on the project.
+  if (process.env.VERCEL) {
+    return vercelManagedUrl ?? genericUrl;
+  }
+
+  return genericUrl ?? vercelManagedUrl;
 }
 
 export function hasDatabaseConfig() {

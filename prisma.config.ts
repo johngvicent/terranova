@@ -3,12 +3,37 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+function firstNonEmpty(...values: Array<string | undefined>) {
+  return values.find((value) => typeof value === "string" && value.length > 0);
+}
+
+function getPrismaDatasourceUrl() {
+  const vercelManagedUrl = firstNonEmpty(
+    process.env.POSTGRES_URL_NON_POOLING,
+    process.env.POSTGRES_DATABASE_URL_UNPOOLED,
+    process.env.POSTGRES_URL,
+    process.env.POSTGRES_DATABASE_URL,
+    process.env.POSTGRES_PRISMA_URL
+  );
+
+  const genericUrl = firstNonEmpty(
+    process.env.DATABASE_URL,
+    process.env.DIRECT_URL
+  );
+
+  if (process.env.VERCEL) {
+    return vercelManagedUrl ?? genericUrl;
+  }
+
+  return genericUrl ?? vercelManagedUrl;
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: getPrismaDatasourceUrl(),
   },
 });
