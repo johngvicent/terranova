@@ -4,6 +4,9 @@
  * The full auth.js re-exports this and adds the CredentialsProvider with Prisma.
  */
 export const authConfig = {
+  // Required for Vercel deployments (preview URLs + custom domains).
+  // Without this, Auth.js v5 rejects requests from hostnames it cannot verify.
+  trustHost: true,
   pages: {
     signIn: "/admin/login",
   },

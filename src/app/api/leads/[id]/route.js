@@ -1,12 +1,18 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { serializeLeadForAdmin } from "@/lib/leads/admin";
 import { updateLeadSchema } from "@/lib/validations";
 
 /**
- * GET /api/leads/[id] — Get a single lead with messages.
+ * GET /api/leads/[id] — Get a single lead with messages (admin only).
  */
 export async function GET(_request, { params }) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return Response.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const lead = await prisma.lead.findUnique({
@@ -32,10 +38,15 @@ export async function GET(_request, { params }) {
 }
 
 /**
- * PATCH /api/leads/[id] — Update lead status or assignment.
+ * PATCH /api/leads/[id] — Update lead status or assignment (admin only).
  */
 export async function PATCH(request, { params }) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return Response.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const body = await request.json();
@@ -68,10 +79,18 @@ export async function PATCH(request, { params }) {
 }
 
 /**
- * DELETE /api/leads/[id] — GDPR: right to be forgotten.
+ * DELETE /api/leads/[id] — GDPR: right to be forgotten (ADMIN only).
  */
 export async function DELETE(_request, { params }) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return Response.json({ error: "No autorizado" }, { status: 401 });
+    }
+    if (session.user.role !== "ADMIN") {
+      return Response.json({ error: "Acceso denegado" }, { status: 403 });
+    }
+
     const { id } = await params;
 
     const existing = await prisma.lead.findUnique({ where: { id } });

@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createLeadSchema } from "@/lib/validations";
 import { formLimiter, apiLimiter } from "@/lib/ratelimit";
@@ -88,10 +89,15 @@ export async function POST(request) {
 }
 
 /**
- * GET /api/leads — List leads (admin only, to be protected later).
+ * GET /api/leads — List leads (admin only).
  */
 export async function GET(request) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return Response.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
