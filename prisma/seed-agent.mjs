@@ -1,5 +1,5 @@
 /**
- * Seed script: crea las cuentas de admin y demo en la base de datos.
+ * Seed script: crea las cuentas de admin y demo o actualiza su contraseña.
  *
  * Uso local (base de datos de desarrollo):
  *   node --experimental-strip-types prisma/seed-agent.mjs
@@ -9,9 +9,9 @@
  *
  * Variables de entorno opcionales para personalizar las cuentas:
  *   ADMIN_EMAIL     (default: admin1@terranova.es)
- *   ADMIN_PASSWORD  (default: admin1234)
+ *   ADMIN_PASSWORD  (default: qwerty1234)
  *   DEMO_EMAIL      (default: agente1@terranova.es)
- *   DEMO_PASSWORD   (default: demo1234)
+ *   DEMO_PASSWORD   (default: qwerty1234)
  */
 
 import "dotenv/config";
@@ -63,14 +63,14 @@ const USERS = [
   {
     nombre: "Admin",
     email: process.env.ADMIN_EMAIL ?? "admin1@terranova.es",
-    password: process.env.ADMIN_PASSWORD ?? "admin1234",
+    password: process.env.ADMIN_PASSWORD ?? "qwerty1234",
     rol: "ADMIN",
     activo: true,
   },
   {
     nombre: "Agente Demo",
     email: process.env.DEMO_EMAIL ?? "agente1@terranova.es",
-    password: process.env.DEMO_PASSWORD ?? "demo1234",
+    password: process.env.DEMO_PASSWORD ?? "qwerty1234",
     rol: "AGENTE",
     activo: true,
   },
@@ -86,20 +86,20 @@ try {
   const summary = [];
 
   for (const { password, ...data } of USERS) {
-    try {
-      const created = await prisma.agent.create({
-        data: { ...data, passwordHash: hashPassword(password) },
-      });
-      console.log(`✓ Creado: ${created.email} (${created.rol})`);
-      summary.push({ email: data.email, password, rol: data.rol, accion: "creado" });
-    } catch (e) {
-      if (e.code === "P2002") {
-        console.log(`- Ya existe: ${data.email} (sin cambios)`);
-        summary.push({ email: data.email, password, rol: data.rol, accion: "ya existía" });
-      } else {
-        throw e;
-      }
-    }
+    const existing = await prisma.agent.findUnique({
+      where: { email: data.email },
+      select: { id: true },
+    });
+
+    const account = await prisma.agent.upsert({
+      where: { email: data.email },
+      create: { ...data, passwordHash: hashPassword(password) },
+      update: { passwordHash: hashPassword(password) },
+    });
+
+    const accion = existing ? "contraseña actualizada" : "creado";
+    console.log(`✓ ${accion}: ${account.email} (${account.rol})`);
+    summary.push({ email: data.email, password, rol: data.rol, accion });
   }
 
   console.log("\n─── Credenciales ──────────────────────────────────────");

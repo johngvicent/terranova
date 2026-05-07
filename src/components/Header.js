@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/propiedades", label: "Propiedades" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export default function Header() {

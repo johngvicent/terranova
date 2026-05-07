@@ -59,6 +59,7 @@ export default function Footer() {
                 { href: "/propiedades", label: "Propiedades" },
                 { href: "/nosotros", label: "Nosotros" },
                 { href: "/contacto", label: "Contacto" },
+                { href: "/admin", label: "Admin" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link
