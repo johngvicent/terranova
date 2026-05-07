@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 const navItems = [
@@ -81,6 +82,18 @@ export default function AdminSidebar({ user }) {
             <p className="text-xs text-white/50 truncate">{user?.role}</p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/admin/login" })}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
+        >
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+            <path d="M10 17l5-5-5-5" />
+            <path d="M15 12H3" />
+          </svg>
+          Cerrar sesión
+        </button>
       </div>
     </aside>
   );
