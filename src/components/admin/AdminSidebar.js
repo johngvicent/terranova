@@ -84,7 +84,7 @@ export default function AdminSidebar({ user }) {
         </div>
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: "/admin/login" })}
+          onClick={() => signOut({ redirectTo: "/admin/login" })}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
         >
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
